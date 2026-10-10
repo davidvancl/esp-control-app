@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -16,6 +17,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -36,7 +38,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.davidvancl.espcontrol.R
 import com.davidvancl.espcontrol.device.FailReason
 import com.davidvancl.espcontrol.device.PairingState
-import com.davidvancl.espcontrol.device.SessionError
+import com.davidvancl.espcontrol.device.Notice
 import com.davidvancl.espcontrol.device.SessionStatus
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -50,6 +52,24 @@ fun DeviceScreen(viewModel: DeviceViewModel, onBack: () -> Unit) {
     val pairing by session.pairing.collectAsStateWithLifecycle()
     val snackbar = remember { SnackbarHostState() }
     val resources = LocalResources.current
+    var confirmRestart by remember { mutableStateOf(false) }
+
+    if (confirmRestart) {
+        AlertDialog(
+            onDismissRequest = { confirmRestart = false },
+            title = { Text(stringResource(R.string.restart_title, info?.name ?: entry?.name.orEmpty())) },
+            text = { Text(stringResource(R.string.restart_message)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    confirmRestart = false
+                    session.restart()
+                }) { Text(stringResource(R.string.restart)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { confirmRestart = false }) { Text(stringResource(R.string.cancel)) }
+            },
+        )
+    }
 
     // Connected only while the app is in the foreground.
     LifecycleStartEffect(session) {
@@ -58,10 +78,12 @@ fun DeviceScreen(viewModel: DeviceViewModel, onBack: () -> Unit) {
     }
 
     LaunchedEffect(session, resources) {
-        session.errors.collect { error ->
-            val text = when (error) {
-                is SessionError.Timeout -> resources.getString(R.string.error_timeout)
-                is SessionError.Request -> resources.getString(R.string.error_request, error.id ?: error.code, error.message)
+        session.notices.collect { notice ->
+            val text = when (notice) {
+                is Notice.Timeout -> resources.getString(R.string.error_timeout)
+                is Notice.Failed -> resources.getString(R.string.error_request, notice.id ?: notice.code, notice.message)
+                Notice.Restarting -> resources.getString(R.string.restarting)
+                Notice.RestartUnsupported -> resources.getString(R.string.restart_unsupported)
             }
             snackbar.showSnackbar(text)
         }
@@ -102,7 +124,8 @@ fun DeviceScreen(viewModel: DeviceViewModel, onBack: () -> Unit) {
                         }
                     }
                     DeviceMenu(
-                        canUnpair = status == SessionStatus.Online,
+                        online = status == SessionStatus.Online,
+                        onRestart = { confirmRestart = true },
                         onUnpair = viewModel::unpair,
                         onForget = { viewModel.forget(onBack) },
                     )
@@ -173,13 +196,20 @@ private fun StatusContent(status: SessionStatus, host: String?, modifier: Modifi
 }
 
 @Composable
-private fun DeviceMenu(canUnpair: Boolean, onUnpair: () -> Unit, onForget: () -> Unit) {
+private fun DeviceMenu(online: Boolean, onRestart: () -> Unit, onUnpair: () -> Unit, onForget: () -> Unit) {
     var open by remember { mutableStateOf(false) }
     IconButton(onClick = { open = true }) {
         Icon(painterResource(R.drawable.ic_more_vert), stringResource(R.string.more))
     }
     DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
-        if (canUnpair) {
+        if (online) {
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.restart_menu)) },
+                onClick = {
+                    open = false
+                    onRestart()
+                },
+            )
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.unpair)) },
                 onClick = {

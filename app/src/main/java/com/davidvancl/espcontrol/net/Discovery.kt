@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.nsd.NsdManager
 import android.net.nsd.NsdServiceInfo
 import android.os.Build
+import android.util.Log
 import java.net.Inet4Address
 import java.net.InetAddress
 import java.util.concurrent.Executors
@@ -19,7 +20,8 @@ data class DiscoveredDevice(
     val name: String,
     val fw: String,
     val proto: Int?,
-    val host: String,
+    /** IP address; `null` until the address record has been resolved. */
+    val host: String?,
 )
 
 sealed interface DiscoveryEvent {
@@ -41,11 +43,14 @@ class Discovery(context: Context) {
         }
 
         fun found(service: NsdServiceInfo) {
-            service.toDevice()?.let { trySendBlocking(DiscoveryEvent.Found(service.serviceName, it)) }
+            val device = service.toDevice()
+            Log.d(TAG, "resolved ${service.serviceName}: $device")
+            device?.let { trySendBlocking(DiscoveryEvent.Found(service.serviceName, it)) }
         }
 
         val listener = object : NsdManager.DiscoveryListener {
             override fun onServiceFound(service: NsdServiceInfo) {
+                Log.d(TAG, "found ${service.serviceName}")
                 post {
                     if (service.serviceName in watchers) return@post
                     watchers[service.serviceName] = watch(service, executor, ::found)
@@ -53,6 +58,7 @@ class Discovery(context: Context) {
             }
 
             override fun onServiceLost(service: NsdServiceInfo) {
+                Log.d(TAG, "lost ${service.serviceName}")
                 post {
                     watchers.remove(service.serviceName)?.stop()
                     trySendBlocking(DiscoveryEvent.Lost(service.serviceName))
@@ -62,6 +68,7 @@ class Discovery(context: Context) {
             override fun onDiscoveryStarted(serviceType: String) = Unit
             override fun onDiscoveryStopped(serviceType: String) = Unit
             override fun onStartDiscoveryFailed(serviceType: String, errorCode: Int) {
+                Log.w(TAG, "discovery failed: $errorCode")
                 close()
             }
 
@@ -92,7 +99,9 @@ class Discovery(context: Context) {
             val callback = object : NsdManager.ServiceInfoCallback {
                 override fun onServiceUpdated(info: NsdServiceInfo) = onResolved(info)
                 override fun onServiceLost() = Unit
-                override fun onServiceInfoCallbackRegistrationFailed(errorCode: Int) = Unit
+                override fun onServiceInfoCallbackRegistrationFailed(errorCode: Int) {
+                    Log.w(TAG, "resolve failed for ${service.serviceName}: $errorCode")
+                }
                 override fun onServiceInfoCallbackUnregistered() = Unit
             }
             nsd.registerServiceInfoCallback(service, executor, callback)
@@ -122,6 +131,7 @@ class Discovery(context: Context) {
             }
 
             override fun onResolveFailed(info: NsdServiceInfo, errorCode: Int) {
+                Log.w(TAG, "resolve failed for ${service.serviceName}: $errorCode")
                 if (attempts <= 1) return
                 runCatching {
                     executor.execute {
@@ -135,19 +145,21 @@ class Discovery(context: Context) {
 
     companion object {
         const val SERVICE_TYPE = "_espctl._tcp"
+        private const val TAG = "EspDiscovery"
 
         private fun NsdServiceInfo.toDevice(): DiscoveredDevice? {
             val txt = attributes.mapValues { (_, bytes) -> bytes?.toString(Charsets.UTF_8).orEmpty() }
-            val id = txt["id"]?.takeIf { it.isNotEmpty() } ?: return null
+            // ESP8266 mDNS answers are sometimes incomplete: the id falls back to the instance name
+            // (`<type>-<id>`), the address may arrive in a later update.
+            val id = txt["id"]?.ifEmpty { null } ?: serviceName.substringAfterLast('-', "").ifEmpty { return null }
             val address = addresses().let { all -> all.firstOrNull { it is Inet4Address } ?: all.firstOrNull() }
-                ?: return null
             return DiscoveredDevice(
                 id = id,
-                type = txt["type"].orEmpty(),
+                type = txt["type"] ?: serviceName.substringBeforeLast('-', ""),
                 name = txt["name"].orEmpty().ifEmpty { serviceName },
                 fw = txt["fw"].orEmpty(),
                 proto = txt["proto"]?.toIntOrNull(),
-                host = address.hostAddress ?: return null,
+                host = address?.hostAddress,
             )
         }
 

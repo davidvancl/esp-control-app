@@ -10,7 +10,13 @@ import com.davidvancl.espcontrol.net.WsConnection
 import com.davidvancl.espcontrol.protocol.Message
 import com.davidvancl.espcontrol.protocol.Protocol
 import com.davidvancl.espcontrol.protocol.Request
+import java.net.InetSocketAddress
+import java.net.Socket
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -55,7 +61,13 @@ class DeviceRepository(context: Context, scope: CoroutineScope) {
     /** Devices announced right now, by mDNS service name. */
     private val announced = MutableStateFlow<Map<String, DiscoveredDevice>>(emptyMap())
 
-    val devices: StateFlow<List<DeviceEntry>> = combine(store.devices, announced) { known, found ->
+    /**
+     * Ids of devices that answered recently (TCP check or an open connection). mDNS on ESP8266
+     * is unreliable, announcements expire while the device is still reachable.
+     */
+    private val reachable = MutableStateFlow<Set<String>>(emptySet())
+
+    val devices: StateFlow<List<DeviceEntry>> = combine(store.devices, announced, reachable) { known, found, answering ->
         val online = found.values.associateBy { it.id }
         (known.keys + online.keys).map { id ->
             val stored = known[id]
@@ -66,7 +78,7 @@ class DeviceRepository(context: Context, scope: CoroutineScope) {
                 type = seen?.type ?: stored?.type.orEmpty(),
                 fw = seen?.fw ?: stored?.fw.orEmpty(),
                 host = seen?.host ?: stored?.lastHost,
-                online = seen != null,
+                online = seen?.host != null || id in answering,
                 known = stored != null,
                 paired = stored?.token != null,
                 token = stored?.token,
@@ -77,8 +89,9 @@ class DeviceRepository(context: Context, scope: CoroutineScope) {
     fun device(id: String): Flow<DeviceEntry?> =
         devices.map { list -> list.firstOrNull { it.id == id } }.distinctUntilChanged()
 
-    /** Runs mDNS discovery until cancelled. Known devices get their last IP updated. */
-    suspend fun discover() {
+    /** Runs mDNS discovery and reachability checks until cancelled. Known devices get their last IP updated. */
+    suspend fun discover() = coroutineScope {
+        launch { checkReachability() }
         try {
             discovery.events().collect { event ->
                 when (event) {
@@ -89,7 +102,7 @@ class DeviceRepository(context: Context, scope: CoroutineScope) {
                                 name = event.device.name,
                                 type = event.device.type,
                                 fw = event.device.fw,
-                                lastHost = event.device.host,
+                                lastHost = event.device.host ?: known.lastHost,
                             )
                         }
                     }
@@ -98,7 +111,32 @@ class DeviceRepository(context: Context, scope: CoroutineScope) {
             }
         } finally {
             announced.value = emptyMap()
+            reachable.value = emptySet()
         }
+    }
+
+    /** Called by an open device connection, so the list matches what the device screen shows. */
+    fun setReachable(id: String, value: Boolean) {
+        reachable.update { if (value) it + id else it - id }
+    }
+
+    /** Tries a TCP connection to every device with a known address. */
+    private suspend fun checkReachability() {
+        while (true) {
+            val targets = devices.value.mapNotNull { device -> device.host?.let { device.id to it } }
+            coroutineScope {
+                for ((id, host) in targets) {
+                    launch { setReachable(id, isReachable(host)) }
+                }
+            }
+            delay(REACHABILITY_INTERVAL_MS)
+        }
+    }
+
+    private suspend fun isReachable(host: String): Boolean = withContext(Dispatchers.IO) {
+        runCatching {
+            Socket().use { it.connect(InetSocketAddress(host, PORT), REACHABILITY_TIMEOUT_MS) }
+        }.isSuccess
     }
 
     fun connect(host: String): DeviceConnection = WsConnection(client, host)
@@ -147,5 +185,8 @@ class DeviceRepository(context: Context, scope: CoroutineScope) {
 
     private companion object {
         const val PROBE_TIMEOUT_MS = 5000L
+        const val PORT = 80
+        const val REACHABILITY_INTERVAL_MS = 10_000L
+        const val REACHABILITY_TIMEOUT_MS = 1500
     }
 }

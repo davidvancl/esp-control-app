@@ -4,6 +4,7 @@ import com.davidvancl.espcontrol.protocol.Message
 import com.davidvancl.espcontrol.protocol.Protocol
 import com.davidvancl.espcontrol.protocol.Request
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.jsonObject
 import org.junit.Assert.assertEquals
@@ -29,7 +30,12 @@ class ProtocolTest {
             json(Protocol.encode(Request.Set("green", JsonPrimitive(40)), 3)),
         )
         assertFalse("v" in json(Protocol.encode(Request.Set("reset"), 4)).jsonObject)
+        assertEquals(
+            json("""{"t":"set","seq":4,"id":"left2","v":null}"""),
+            json(Protocol.encode(Request.Set("left2", JsonNull), 4)),
+        )
         assertEquals(json("""{"t":"pin","seq":5,"pin":"4821"}"""), json(Protocol.encode(Request.Pin("4821"), 5)))
+        assertEquals(json("""{"t":"restart","seq":6}"""), json(Protocol.encode(Request.Restart, 6)))
     }
 
     @Test

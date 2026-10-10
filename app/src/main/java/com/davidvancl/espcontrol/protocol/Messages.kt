@@ -38,6 +38,11 @@ sealed interface Request {
     @Serializable
     @SerialName("unpair")
     data object Unpair : Request
+
+    /** The device replies `ack` and restarts about 0.5 s later. */
+    @Serializable
+    @SerialName("restart")
+    data object Restart : Request
 }
 
 /** Messages sent by the device. Unsolicited messages have no `seq`. */

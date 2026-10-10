@@ -55,9 +55,14 @@ sealed interface PairingState {
 
 enum class PairingError { TIMEOUT, REJECTED, BUSY, UNSUPPORTED, NO_CONNECTION }
 
-sealed interface SessionError {
-    data class Request(val id: String?, val code: String, val message: String) : SessionError
-    data class Timeout(val id: String?) : SessionError
+/** Messages for the user, shown as a snackbar. */
+sealed interface Notice {
+    data class Failed(val id: String?, val code: String, val message: String) : Notice
+    data class Timeout(val id: String?) : Notice
+
+    /** Older firmware does not know the request (`bad_request`). */
+    data object RestartUnsupported : Notice
+    data object Restarting : Notice
 }
 
 /**
@@ -88,8 +93,8 @@ class DeviceSession(
     private val _pairing = MutableStateFlow<PairingState>(PairingState.Idle)
     val pairing: StateFlow<PairingState> = _pairing.asStateFlow()
 
-    private val _errors = MutableSharedFlow<SessionError>(extraBufferCapacity = 8)
-    val errors: SharedFlow<SessionError> = _errors.asSharedFlow()
+    private val _notices = MutableSharedFlow<Notice>(extraBufferCapacity = 8)
+    val notices: SharedFlow<Notice> = _notices.asSharedFlow()
 
     private var job: Job? = null
     private var connection: DeviceConnection? = null
@@ -118,8 +123,8 @@ class DeviceSession(
         }
         scope.launch {
             when (val reply = request(Request.Set(id, value))) {
-                null -> _errors.emit(SessionError.Timeout(id))
-                is Message.Err -> _errors.emit(SessionError.Request(id, reply.code, reply.msg))
+                null -> _notices.emit(Notice.Timeout(id))
+                is Message.Err -> _notices.emit(Notice.Failed(id, reply.code, reply.msg))
                 else -> Unit
             }
         }
@@ -142,7 +147,7 @@ class DeviceSession(
     fun submitPin(pin: String) {
         scope.launch {
             when (val reply = request(Request.Pin(pin))) {
-                null -> _errors.emit(SessionError.Timeout(null))
+                null -> _notices.emit(Notice.Timeout(null))
                 is Message.Err -> _pairing.update { state ->
                     if (state is PairingState.Waiting && reply.code == ErrorCode.AUTH) state.copy(wrongPin = true)
                     else state
@@ -154,6 +159,20 @@ class DeviceSession(
 
     fun cancelPairing() {
         _pairing.value = PairingState.Idle
+    }
+
+    /** Asks the device to restart; the connection drops and reconnects with backoff. */
+    fun restart() {
+        scope.launch {
+            when (val reply = request(Request.Restart)) {
+                null -> _notices.emit(Notice.Timeout(null))
+                is Message.Err -> _notices.emit(
+                    if (reply.code == ErrorCode.BAD_REQUEST) Notice.RestartUnsupported
+                    else Notice.Failed(null, reply.code, reply.msg)
+                )
+                else -> _notices.emit(Notice.Restarting)
+            }
+        }
     }
 
     /** Removes this phone's token on the device and locally. */
@@ -186,6 +205,7 @@ class DeviceSession(
                 }
                 Outcome.AUTHED, Outcome.UNREACHABLE -> {
                     _status.value = SessionStatus.Offline
+                    if (outcome == Outcome.UNREACHABLE) repository.setReachable(deviceId, false)
                     if (outcome == Outcome.AUTHED) backoff = MIN_BACKOFF_MS
                     if (pairOnConnect) {
                         pairOnConnect = false
@@ -249,6 +269,7 @@ class DeviceSession(
         if (info.id != deviceId) return false
         _info.value = info
         _values.value = emptyMap()
+        repository.setReachable(deviceId, true)
         repository.remember(info, host)
         if (info.authed) {
             _status.value = SessionStatus.Online
@@ -263,8 +284,8 @@ class DeviceSession(
     private suspend fun loadState() {
         when (val reply = request(Request.Get)) {
             is Message.State -> _values.update { it + reply.values }
-            is Message.Err -> _errors.emit(SessionError.Request(null, reply.code, reply.msg))
-            null -> _errors.emit(SessionError.Timeout(null))
+            is Message.Err -> _notices.emit(Notice.Failed(null, reply.code, reply.msg))
+            null -> _notices.emit(Notice.Timeout(null))
             else -> Unit
         }
     }

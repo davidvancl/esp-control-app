@@ -4,6 +4,12 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
+// The only place to change the version; a new version on main publishes a GitHub release.
+val appVersion = "0.1.0"
+
+// Release signing for CI, see .github/workflows/release.yml. Without it the release APK is unsigned.
+val releaseKeystore: String? = System.getenv("ANDROID_KEYSTORE_FILE")
+
 android {
     namespace = "com.davidvancl.espcontrol"
     compileSdk {
@@ -14,14 +20,28 @@ android {
         applicationId = "com.davidvancl.espcontrol"
         minSdk = 26
         targetSdk = 37
-        versionCode = 1
-        versionName = "0.1.0"
+        versionName = appVersion
+        versionCode = appVersion.split(".").map(String::toInt).let { (major, minor, patch) ->
+            major * 10_000 + minor * 100 + patch
+        }
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        if (releaseKeystore != null) {
+            create("release") {
+                storeFile = file(releaseKeystore)
+                storePassword = System.getenv("ANDROID_KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("ANDROID_KEY_ALIAS")
+                keyPassword = System.getenv("ANDROID_KEY_PASSWORD")
+            }
+        }
+    }
+
     buildTypes {
         release {
+            if (releaseKeystore != null) signingConfig = signingConfigs.getByName("release")
             optimization {
                 enable = true
                 packageScope = setOf("androidx.**", "kotlin.**", "kotlinx.**")

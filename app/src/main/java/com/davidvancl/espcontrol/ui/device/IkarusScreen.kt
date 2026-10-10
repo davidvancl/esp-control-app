@@ -20,6 +20,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -52,6 +53,7 @@ import java.util.Date
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.intOrNull
@@ -77,13 +79,19 @@ fun IkarusScreen(
         Section(stringResource(R.string.ikarus_displays), stringResource(R.string.ikarus_displays_hint)) {
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 for ((id, label) in listOf("left2" to R.string.ikarus_left, "right2" to R.string.ikarus_right)) {
-                    DisplayTile(stringResource(label), int(id), 2, Modifier.weight(1f)) { onSet(id, JsonPrimitive(it)) }
+                    DisplayTile(stringResource(label), values[id], 2, Modifier.weight(1f)) { onSet(id, displayValue(it)) }
                 }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 for ((id, label) in listOf("left4" to R.string.ikarus_left, "right4" to R.string.ikarus_right)) {
-                    DisplayTile(stringResource(label), int(id), 4, Modifier.weight(1f)) { onSet(id, JsonPrimitive(it)) }
+                    DisplayTile(stringResource(label), values[id], 4, Modifier.weight(1f)) { onSet(id, displayValue(it)) }
                 }
+            }
+            OutlinedButton(
+                onClick = { DISPLAYS.forEach { onSet(it, JsonNull) } },
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(stringResource(R.string.ikarus_blank_all))
             }
             IntSlider(
                 label = stringResource(R.string.ikarus_intensity),
@@ -190,9 +198,17 @@ private fun PanelButton(label: String, color: Color, count: Int) {
     }
 }
 
-/** Looks like the 7-segment display on the panel; tap to enter a new number. */
+/** `null` blanks the display. */
+private fun displayValue(number: Int?): JsonElement = number?.let(::JsonPrimitive) ?: JsonNull
+
+/**
+ * Looks like the 7-segment display on the panel; tap to enter a new number or blank it.
+ * [state] is `null` while unknown (write-only, nothing sent yet), [JsonNull] when blank.
+ */
 @Composable
-private fun DisplayTile(label: String, value: Int?, digits: Int, modifier: Modifier, onSet: (Int) -> Unit) {
+private fun DisplayTile(label: String, state: JsonElement?, digits: Int, modifier: Modifier, onSet: (Int?) -> Unit) {
+    val value = (state as? JsonPrimitive)?.intOrNull
+    val blank = state is JsonNull
     var editing by remember { mutableStateOf(false) }
     val max = if (digits == 2) 99 else 9999
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -206,8 +222,18 @@ private fun DisplayTile(label: String, value: Int?, digits: Int, modifier: Modif
             contentAlignment = Alignment.Center,
         ) {
             Text(
-                value?.toString()?.padStart(digits, '0') ?: "-".repeat(digits),
-                color = if (value != null) DISPLAY_DIGIT else DISPLAY_DIGIT.copy(alpha = 0.35f),
+                when {
+                    value != null -> value.toString().padStart(digits, '0')
+                    blank -> "8".repeat(digits)
+                    else -> "-".repeat(digits)
+                },
+                color = DISPLAY_DIGIT.copy(
+                    alpha = when {
+                        value != null -> 1f
+                        blank -> 0.08f // unlit segments
+                        else -> 0.35f
+                    }
+                ),
                 fontFamily = FontFamily.Monospace,
                 fontWeight = FontWeight.Bold,
                 fontSize = 30.sp,
@@ -223,8 +249,9 @@ private fun DisplayTile(label: String, value: Int?, digits: Int, modifier: Modif
     }
 }
 
+/** [onConfirm] receives the number, or `null` to blank the display. */
 @Composable
-private fun NumberDialog(title: String, value: Int?, max: Int, onDismiss: () -> Unit, onConfirm: (Int) -> Unit) {
+private fun NumberDialog(title: String, value: Int?, max: Int, onDismiss: () -> Unit, onConfirm: (Int?) -> Unit) {
     var text by remember { mutableStateOf(value?.toString().orEmpty()) }
     val parsed = text.toIntOrNull()?.takeIf { it in 0..max }
     val focus = remember { FocusRequester() }
@@ -250,7 +277,10 @@ private fun NumberDialog(title: String, value: Int?, max: Int, onDismiss: () -> 
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
+            Row {
+                TextButton(onClick = { onConfirm(null) }) { Text(stringResource(R.string.ikarus_blank)) }
+                TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
+            }
         },
     )
 }
@@ -263,6 +293,7 @@ private val RED = Color(0xFFD32F2F)
 private val NEUTRAL = Color(0xFF607D8B)
 private val DISPLAY_BACKGROUND = Color(0xFF1A1A1A)
 private val DISPLAY_DIGIT = Color(0xFFFF3B30)
+private val DISPLAYS = listOf("left2", "right2", "left4", "right4")
 private val BUTTONS = listOf(
     PanelButtonSpec("greenButton", R.string.ikarus_green_button, GREEN),
     PanelButtonSpec("redButton", R.string.ikarus_red_button, RED),

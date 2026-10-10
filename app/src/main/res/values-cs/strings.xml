@@ -24,6 +24,12 @@
     <string name="status_online_short">Připojeno</string>
     <string name="status_offline_short">Nedostupné</string>
     <string name="status_pairing_short">Nespárováno</string>
+    <string name="restart_menu">Restartovat zařízení</string>
+    <string name="restart_title">Restartovat %1$s?</string>
+    <string name="restart_message">Zařízení se na pár sekund odpojí a aplikace se pak sama znovu připojí. Displeje se vymažou.</string>
+    <string name="restart">Restartovat</string>
+    <string name="restarting">Zařízení se restartuje…</string>
+    <string name="restart_unsupported">Firmware zařízení zatím restart nepodporuje. Aktualizuj firmware.</string>
     <string name="unpair">Zrušit spárování</string>
     <string name="forget">Zapomenout zařízení</string>
     <string name="error_timeout">Zařízení neodpovědělo</string>
@@ -60,7 +66,9 @@
     <string name="ikarus_last_press">Poslední stisk: %1$s v %2$s</string>
     <string name="ikarus_no_press">Od připojení nebylo stisknuto žádné tlačítko.</string>
     <string name="ikarus_displays">Displeje</string>
-    <string name="ikarus_displays_hint">Klepni na displej a zadej nové číslo.</string>
+    <string name="ikarus_displays_hint">Klepni na displej a zadej nové číslo, nebo ho zhasni.</string>
+    <string name="ikarus_blank">Zhasnout</string>
+    <string name="ikarus_blank_all">Zhasnout všechny displeje</string>
     <string name="ikarus_left">Levý</string>
     <string name="ikarus_right">Pravý</string>
     <string name="ikarus_intensity">Jas displejů</string>

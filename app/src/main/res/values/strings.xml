@@ -26,6 +26,12 @@
     <string name="status_online_short">Connected</string>
     <string name="status_offline_short">Unreachable</string>
     <string name="status_pairing_short">Not paired</string>
+    <string name="restart_menu">Restart device</string>
+    <string name="restart_title">Restart %1$s?</string>
+    <string name="restart_message">The device disconnects for a few seconds and the app reconnects automatically. The displays will be cleared.</string>
+    <string name="restart">Restart</string>
+    <string name="restarting">Device is restarting…</string>
+    <string name="restart_unsupported">The device firmware does not support restart yet. Update the firmware.</string>
     <string name="unpair">Unpair</string>
     <string name="forget">Forget device</string>
     <string name="error_timeout">The device did not answer</string>
@@ -62,7 +68,9 @@
     <string name="ikarus_last_press">Last press: %1$s at %2$s</string>
     <string name="ikarus_no_press">No button pressed since connecting.</string>
     <string name="ikarus_displays">Displays</string>
-    <string name="ikarus_displays_hint">Tap a display to change its number.</string>
+    <string name="ikarus_displays_hint">Tap a display to change its number or blank it.</string>
+    <string name="ikarus_blank">Blank</string>
+    <string name="ikarus_blank_all">Blank all displays</string>
     <string name="ikarus_left">Left</string>
     <string name="ikarus_right">Right</string>
     <string name="ikarus_intensity">Brightness</string>

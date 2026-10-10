@@ -13,6 +13,8 @@ export JAVA_HOME="/c/Program Files/Android/Android Studio/jbr"
 ./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
 ```
 
+The app version is `appVersion` in `app/build.gradle.kts`; changing it on `main` publishes a GitHub release (see README, Releases).
+
 ## Layout (package `com.davidvancl.espcontrol`)
 
 | Package | Responsibility |
