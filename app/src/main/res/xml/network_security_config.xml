@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ESP devices speak plain ws:// on the local network (TLS is too heavy for ESP8266, see DESIGN.md).
+  Devices are addressed by IP from mDNS or entered manually, so cleartext cannot be limited to a domain.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true" />
+</network-security-config>

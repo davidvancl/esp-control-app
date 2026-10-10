@@ -1,0 +1,90 @@
+<resources>
+    <string name="back">Zpět</string>
+    <string name="settings">Nastavení</string>
+    <string name="refresh">Obnovit</string>
+    <string name="more">Další</string>
+    <string name="send">Odeslat</string>
+    <string name="cancel">Zrušit</string>
+
+    <!-- Device list -->
+    <string name="searching">Hledám zařízení v síti…</string>
+    <string name="searching_hint">Zařízení musí být na stejné WiFi. Pokud se nic neobjeví, přidej zařízení podle IP adresy v Nastavení.</string>
+    <string name="online">Online</string>
+    <string name="offline">Offline</string>
+    <string name="paired">Spárováno</string>
+    <string name="not_paired">Nespárováno</string>
+    <string name="firmware">FW %1$s</string>
+    <string name="local_network_denied">Bez přístupu k lokální síti aplikace nemůže zařízení najít ani ovládat.</string>
+
+    <!-- Device -->
+    <string name="status_connecting">Připojování…</string>
+    <string name="status_offline">Zařízení není dostupné. Zkouším se znovu připojit…</string>
+    <string name="status_no_address">Adresa zařízení není známá. Počkej, až se objeví v síti, nebo ho přidej podle IP adresy v Nastavení.</string>
+    <string name="status_protocol">Zařízení používá verzi protokolu, kterou tato aplikace nepodporuje. Aktualizuj aplikaci.</string>
+    <string name="status_online_short">Připojeno</string>
+    <string name="status_offline_short">Nedostupné</string>
+    <string name="status_pairing_short">Nespárováno</string>
+    <string name="unpair">Zrušit spárování</string>
+    <string name="forget">Zapomenout zařízení</string>
+    <string name="error_timeout">Zařízení neodpovědělo</string>
+    <string name="error_request">%1$s: %2$s</string>
+
+    <!-- Pairing -->
+    <string name="pairing_title">Párování</string>
+    <string name="pairing_intro">Tento telefon zatím není se zařízením spárovaný. Bez spárování nejde nic číst ani ovládat.</string>
+    <string name="pair">Spárovat</string>
+    <string name="pairing_starting">Spouštím párování…</string>
+    <string name="pairing_pin">Zadej PIN zobrazený na zařízení.</string>
+    <string name="pairing_pin_label">PIN</string>
+    <string name="pairing_wrong_pin">Špatný PIN, zkus to znovu.</string>
+    <string name="pairing_confirm">Potvrď párování na zařízení.</string>
+    <string name="pairing_remaining">Zbývá %1$d s</string>
+    <string name="pairing_timeout">Čas na spárování vypršel.</string>
+    <string name="pairing_rejected">Párování bylo odmítnuto.</string>
+    <string name="pairing_busy">Párování už probíhá z jiného telefonu.</string>
+    <string name="pairing_unsupported">Toto zařízení nepodporuje párování.</string>
+    <string name="pairing_no_connection">Spojení se zařízením se přerušilo.</string>
+    <string name="try_again">Zkusit znovu</string>
+
+    <!-- Ikarus -->
+    <string name="ikarus_inputs">Vstupy panelu</string>
+    <string name="ikarus_inputs_hint">Živě: tlačítko se rozsvítí, když ho na panelu stiskneš.</string>
+    <string name="ikarus_key">Klíček</string>
+    <string name="ikarus_key_on">ZAPNUTO</string>
+    <string name="ikarus_key_off">VYPNUTO</string>
+    <string name="ikarus_green_button">Zelené</string>
+    <string name="ikarus_red_button">Červené</string>
+    <string name="ikarus_button1">1</string>
+    <string name="ikarus_button2">2</string>
+    <string name="ikarus_button3">3</string>
+    <string name="ikarus_last_press">Poslední stisk: %1$s v %2$s</string>
+    <string name="ikarus_no_press">Od připojení nebylo stisknuto žádné tlačítko.</string>
+    <string name="ikarus_displays">Displeje</string>
+    <string name="ikarus_displays_hint">Klepni na displej a zadej nové číslo.</string>
+    <string name="ikarus_left">Levý</string>
+    <string name="ikarus_right">Pravý</string>
+    <string name="ikarus_intensity">Jas displejů</string>
+    <string name="ikarus_leds">Světla tlačítek</string>
+    <string name="ikarus_leds_hint">Jas podsvícení zeleného a červeného tlačítka.</string>
+    <string name="ikarus_green">Zelené</string>
+    <string name="ikarus_red">Červené</string>
+    <string name="range_hint">%1$d–%2$d</string>
+
+    <!-- Generic device -->
+    <string name="generic_unknown_type">Neznámý typ zařízení „%1$s“. Zobrazuji surové hodnoty.</string>
+    <string name="generic_values">Hodnoty</string>
+    <string name="generic_controls">Ovládání</string>
+    <string name="generic_value_hint">JSON hodnota, prázdné pro akci</string>
+
+    <!-- Settings -->
+    <string name="add_by_ip">Přidat zařízení podle IP adresy</string>
+    <string name="ip_address">IP adresa</string>
+    <string name="add">Přidat</string>
+    <string name="adding">Připojování…</string>
+    <string name="added">Přidáno: %1$s</string>
+    <string name="add_failed">Na adrese %1$s neodpovědělo žádné zařízení</string>
+    <string name="known_devices">Známá zařízení</string>
+    <string name="no_known_devices">Žádná známá zařízení.</string>
+    <string name="remove">Odebrat</string>
+    <string name="about">ESP Control %1$s · protokol v%2$d</string>
+</resources>
