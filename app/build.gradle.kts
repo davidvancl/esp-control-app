@@ -33,7 +33,7 @@ android {
             create("release") {
                 storeFile = file(releaseKeystore)
                 storePassword = System.getenv("ANDROID_KEYSTORE_PASSWORD")
-                keyAlias = System.getenv("ANDROID_KEY_ALIAS")
+                keyAlias = System.getenv("ANDROID_KEY_ALIAS")?.trim()
                 keyPassword = System.getenv("ANDROID_KEY_PASSWORD")
             }
         }
