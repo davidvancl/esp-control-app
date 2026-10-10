@@ -110,8 +110,9 @@ class DeviceRepository(context: Context, scope: CoroutineScope) {
                 }
             }
         } finally {
+            // `reachable` is kept, so devices do not blink offline when discovery restarts (pull to refresh);
+            // the reachability check updates it right after the restart.
             announced.value = emptyMap()
-            reachable.value = emptySet()
         }
     }
 
@@ -120,16 +121,18 @@ class DeviceRepository(context: Context, scope: CoroutineScope) {
         reachable.update { if (value) it + id else it - id }
     }
 
-    /** Tries a TCP connection to every device with a known address. */
     private suspend fun checkReachability() {
         while (true) {
-            val targets = devices.value.mapNotNull { device -> device.host?.let { device.id to it } }
-            coroutineScope {
-                for ((id, host) in targets) {
-                    launch { setReachable(id, isReachable(host)) }
-                }
-            }
+            checkReachabilityNow()
             delay(REACHABILITY_INTERVAL_MS)
+        }
+    }
+
+    /** Tries a TCP connection to every device with a known address, returns when all answered or timed out. */
+    suspend fun checkReachabilityNow() = coroutineScope {
+        val targets = devices.value.mapNotNull { device -> device.host?.let { device.id to it } }
+        for ((id, host) in targets) {
+            launch { setReachable(id, isReachable(host)) }
         }
     }
 

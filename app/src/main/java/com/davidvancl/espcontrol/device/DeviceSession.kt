@@ -48,9 +48,26 @@ sealed interface PairingState {
     data object Idle : PairingState
     data object Starting : PairingState
 
-    /** Device is waiting for the PIN (`pin`) or for a confirmation on the device (`confirm`). */
-    data class Waiting(val method: String, val deadline: Long, val wrongPin: Boolean = false) : PairingState
+    /**
+     * Device is waiting for the PIN (`pin`) or for a confirmation on the device (`confirm`).
+     * The PIN has [length] symbols: digits, or indices into [symbols] when the device sends them.
+     * [wrongAttempts] counts PINs rejected by the device, so the entry is cleared after every one.
+     */
+    data class Waiting(
+        val method: String,
+        val deadline: Long,
+        val length: Int = DEFAULT_PIN_LENGTH,
+        val symbols: List<String>? = null,
+        val wrongAttempts: Int = 0,
+    ) : PairingState {
+        val wrongPin: Boolean get() = wrongAttempts > 0
+    }
+
     data class Failed(val reason: PairingError) : PairingState
+
+    companion object {
+        const val DEFAULT_PIN_LENGTH = 4
+    }
 }
 
 enum class PairingError { TIMEOUT, REJECTED, BUSY, UNSUPPORTED, NO_CONNECTION }
@@ -149,7 +166,9 @@ class DeviceSession(
             when (val reply = request(Request.Pin(pin))) {
                 null -> _notices.emit(Notice.Timeout(null))
                 is Message.Err -> _pairing.update { state ->
-                    if (state is PairingState.Waiting && reply.code == ErrorCode.AUTH) state.copy(wrongPin = true)
+                    if (state is PairingState.Waiting && reply.code == ErrorCode.AUTH) {
+                        state.copy(wrongAttempts = state.wrongAttempts + 1)
+                    }
                     else state
                 }
                 else -> Unit
@@ -319,6 +338,8 @@ class DeviceSession(
                 "waiting" -> PairingState.Waiting(
                     method = message.method.orEmpty(),
                     deadline = System.currentTimeMillis() + (message.timeout ?: 60) * 1000L,
+                    length = message.length?.takeIf { it > 0 } ?: PairingState.DEFAULT_PIN_LENGTH,
+                    symbols = message.symbols?.takeIf { it.isNotEmpty() },
                 )
                 "timeout" -> PairingState.Failed(PairingError.TIMEOUT)
                 "rejected" -> PairingState.Failed(PairingError.REJECTED)

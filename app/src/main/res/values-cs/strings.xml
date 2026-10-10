@@ -8,7 +8,7 @@
 
     <!-- Device list -->
     <string name="searching">Hledám zařízení v síti…</string>
-    <string name="searching_hint">Zařízení musí být na stejné WiFi. Pokud se nic neobjeví, přidej zařízení podle IP adresy v Nastavení.</string>
+    <string name="searching_hint">Zařízení musí být na stejné WiFi. Táhni dolů pro nové hledání. Pokud se nic neobjeví, přidej zařízení podle IP adresy v Nastavení.</string>
     <string name="online">Online</string>
     <string name="offline">Offline</string>
     <string name="paired">Spárováno</string>
@@ -51,6 +51,15 @@
     <string name="pairing_unsupported">Toto zařízení nepodporuje párování.</string>
     <string name="pairing_no_connection">Spojení se zařízením se přerušilo.</string>
     <string name="try_again">Zkusit znovu</string>
+    <string name="pairing_symbols">Pokladnička bliká barvy – zadej je ve stejném pořadí.</string>
+    <string name="pairing_wrong_sequence">Špatné pořadí, zkus to znovu.</string>
+    <string name="pairing_delete">Smazat</string>
+    <string name="pairing_restart_entry">Znovu</string>
+    <string name="color_red">červená</string>
+    <string name="color_green">zelená</string>
+    <string name="color_blue">modrá</string>
+    <string name="color_yellow">žlutá</string>
+    <string name="color_purple">fialová</string>
 
     <!-- Ikarus -->
     <string name="ikarus_inputs">Vstupy panelu</string>
@@ -77,6 +86,31 @@
     <string name="ikarus_green">Zelené</string>
     <string name="ikarus_red">Červené</string>
     <string name="range_hint">%1$d–%2$d</string>
+
+    <!-- Coin jar -->
+    <string name="coin_jar_coins">Mince</string>
+    <string name="coin_jar_coins_hint">Počítáno od zapnutí pokladničky. S každou mincí se číslo rozzáří.</string>
+    <plurals name="coin_jar_coins_unit">
+        <item quantity="one">mince</item>
+        <item quantity="few">mince</item>
+        <item quantity="many">mince</item>
+        <item quantity="other">mincí</item>
+    </plurals>
+    <string name="coin_jar_edit">Opravit počet</string>
+    <string name="coin_jar_reset">Vynulovat počítadlo</string>
+    <string name="coin_jar_reset_title">Vynulovat počítadlo?</string>
+    <string name="coin_jar_reset_message">Počet mincí se nastaví na 0. Nejde to vrátit zpět.</string>
+    <string name="coin_jar_reset_confirm">Vynulovat</string>
+    <string name="coin_jar_sound">Zvuk</string>
+    <string name="coin_jar_sound_hint">Cinknutí, které zahraje s každou mincí.</string>
+    <string name="coin_jar_volume">Hlasitost</string>
+    <string name="coin_jar_chime">Přehrát cinknutí</string>
+    <string name="coin_jar_diagnostics">Diagnostika závory</string>
+    <string name="coin_jar_diagnostics_hint">Po rozbalení se hodnoty obnovují každou sekundu.</string>
+    <string name="coin_jar_barrier_ok">OK</string>
+    <string name="coin_jar_barrier_failed">Nefunguje</string>
+    <string name="coin_jar_sensor">Aktuální hodnota</string>
+    <string name="coin_jar_baseline">Klidová hodnota</string>
 
     <!-- Generic device -->
     <string name="generic_unknown_type">Neznámý typ zařízení „%1$s“. Zobrazuji surové hodnoty.</string>

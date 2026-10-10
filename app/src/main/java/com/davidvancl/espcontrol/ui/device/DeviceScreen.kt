@@ -154,6 +154,14 @@ fun DeviceScreen(viewModel: DeviceViewModel, onBack: () -> Unit) {
                         onSetContinuous = viewModel::setThrottled,
                         modifier = modifier,
                     )
+                    "coin-jar" -> CoinJarScreen(
+                        values = values,
+                        events = session.events,
+                        onSet = viewModel::set,
+                        onSetContinuous = viewModel::setThrottled,
+                        onRefresh = session::refresh,
+                        modifier = modifier,
+                    )
                     else -> GenericDeviceScreen(
                         type = current?.type.orEmpty(),
                         readable = current?.get.orEmpty(),

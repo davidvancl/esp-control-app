@@ -87,6 +87,10 @@ sealed interface Message {
         val state: String,
         val method: String? = null,
         val timeout: Int? = null,
+        /** Number of PIN symbols (`pin` method). */
+        val length: Int? = null,
+        /** PIN alphabet; without it the PIN is digits 0–9. Colors are `#RRGGBB`. */
+        val symbols: List<String>? = null,
     ) : Message
 
     @Serializable

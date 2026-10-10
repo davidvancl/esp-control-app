@@ -10,7 +10,7 @@
 
     <!-- Device list -->
     <string name="searching">Searching for devices on the network…</string>
-    <string name="searching_hint">Devices must be on the same WiFi. If nothing shows up, add a device by IP address in Settings.</string>
+    <string name="searching_hint">Devices must be on the same WiFi. Pull down to search again. If nothing shows up, add a device by IP address in Settings.</string>
     <string name="online">Online</string>
     <string name="offline">Offline</string>
     <string name="paired">Paired</string>
@@ -53,6 +53,15 @@
     <string name="pairing_unsupported">This device does not support pairing.</string>
     <string name="pairing_no_connection">Connection to the device was lost.</string>
     <string name="try_again">Try again</string>
+    <string name="pairing_symbols">The device is blinking colors – enter them in the same order.</string>
+    <string name="pairing_wrong_sequence">Wrong order, try again.</string>
+    <string name="pairing_delete">Delete</string>
+    <string name="pairing_restart_entry">Start over</string>
+    <string name="color_red">red</string>
+    <string name="color_green">green</string>
+    <string name="color_blue">blue</string>
+    <string name="color_yellow">yellow</string>
+    <string name="color_purple">purple</string>
 
     <!-- Ikarus -->
     <string name="ikarus_inputs">Panel inputs</string>
@@ -79,6 +88,30 @@
     <string name="ikarus_green">Green</string>
     <string name="ikarus_red">Red</string>
     <string name="range_hint">%1$d–%2$d</string>
+
+    <!-- Coin jar -->
+    <string name="coin_jar_coins">Coins</string>
+    <string name="coin_jar_coins_hint">Counted since the jar was switched on. The number lights up with every coin.</string>
+    <plurals name="coin_jar_coins_unit">
+        <item quantity="one">coin</item>
+        <item quantity="other">coins</item>
+    </plurals>
+    <string name="coin_jar_edit">Correct the count</string>
+    <string name="coin_jar_reset">Reset counter</string>
+    <string name="coin_jar_reset_title">Reset counter?</string>
+    <string name="coin_jar_reset_message">The coin count is set to 0. This cannot be undone.</string>
+    <string name="coin_jar_reset_confirm">Reset</string>
+    <string name="coin_jar_sound">Sound</string>
+    <string name="coin_jar_sound_hint">Chime played with every coin.</string>
+    <string name="coin_jar_volume">Volume</string>
+    <string name="coin_jar_chime">Play chime</string>
+    <string name="coin_jar_diagnostics">Light barrier diagnostics</string>
+    <string name="coin_jar_diagnostics_hint">Values are refreshed every second while open.</string>
+    <string name="coin_jar_barrier_ok">OK</string>
+    <string name="coin_jar_barrier_failed">Not working</string>
+    <string name="coin_jar_sensor">Current value</string>
+    <string name="coin_jar_baseline">Idle value</string>
+    <string name="coin_jar_adc_value" translatable="false">%1$d / %2$d</string>
 
     <!-- Generic device -->
     <string name="generic_unknown_type">Unknown device type \"%1$s\". Showing raw values.</string>

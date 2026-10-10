@@ -24,6 +24,6 @@ The app version is `appVersion` in `app/build.gradle.kts`; changing it on `main`
 | `data` | `KnownDeviceStore` (DataStore), `DeviceRepository` (known + discovered devices) |
 | `device` | `DeviceSession` – one connection: hello, requests by `seq`, events, pairing, reconnect |
 | `ui.list` | device list, settings (manual IP, remove device) |
-| `ui.device` | device detail, pairing, one screen per device type (`IkarusScreen`), `GenericDeviceScreen` fallback |
+| `ui.device` | device detail, pairing, one screen per device type (`IkarusScreen`, `CoinJarScreen`), `GenericDeviceScreen` fallback |
 
 A new device type gets its screen in `ui.device` and a branch in `DeviceScreen`, after its table is added to DESIGN.md.

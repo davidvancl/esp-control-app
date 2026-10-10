@@ -79,6 +79,26 @@ class ProtocolTest {
     }
 
     @Test
+    fun decodesPairingWithSymbols() {
+        assertEquals(
+            Message.Pairing(
+                state = "waiting",
+                method = "pin",
+                timeout = 60,
+                length = 4,
+                symbols = listOf("#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#FF00FF"),
+            ),
+            Protocol.decode(
+                """{"t":"pairing","state":"waiting","method":"pin","timeout":60,"length":4,
+                   "symbols":["#FF0000","#00FF00","#0000FF","#FFFF00","#FF00FF"]}"""
+            ),
+        )
+        val old = Protocol.decode("""{"t":"pairing","state":"waiting","method":"pin","timeout":60}""") as Message.Pairing
+        assertNull(old.length)
+        assertNull(old.symbols)
+    }
+
+    @Test
     fun ignoresUnknownAndInvalidMessages() {
         assertNull(Protocol.decode("""{"t":"something_new","seq":1}"""))
         assertNull(Protocol.decode("not json"))

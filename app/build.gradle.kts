@@ -5,7 +5,7 @@ plugins {
 }
 
 // The only place to change the version; a new version on main publishes a GitHub release.
-val appVersion = "0.1.0"
+val appVersion = "0.1.1"
 
 // Release signing for CI, see .github/workflows/release.yml. Without it the release APK is unsigned.
 val releaseKeystore: String? = System.getenv("ANDROID_KEYSTORE_FILE")

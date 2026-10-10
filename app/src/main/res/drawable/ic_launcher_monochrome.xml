@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Themed icon (Android 13+): one color, so the chip is an outline and the WiFi symbol is drawn inside. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="M30,41h7v4h-7z M30,52h7v4h-7z M30,63h7v4h-7z
+            M71,41h7v4h-7z M71,52h7v4h-7z M71,63h7v4h-7z
+            M41,30h4v7h-4z M52,30h4v7h-4z M63,30h4v7h-4z
+            M41,71h4v7h-4z M52,71h4v7h-4z M63,71h4v7h-4z" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M42,37.75h24a4.25,4.25 0,0 1,4.25 4.25v24a4.25,4.25 0,0 1,-4.25 4.25h-24a4.25,4.25 0,0 1,-4.25 -4.25v-24a4.25,4.25 0,0 1,4.25 -4.25z"
+        android:strokeWidth="3.5"
+        android:strokeColor="#FF000000" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M44.1,53.1 A14,14 0,0 1,63.9 53.1 M48.34,57.34 A8,8 0,0 1,59.66 57.34"
+        android:strokeWidth="3.5"
+        android:strokeColor="#FF000000"
+        android:strokeLineCap="round" />
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="M54,63m-3,0a3,3 0,1 0,6 0a3,3 0,1 0,-6 0" />
+</vector>

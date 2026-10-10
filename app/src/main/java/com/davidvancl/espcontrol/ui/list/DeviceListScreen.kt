@@ -22,6 +22,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -44,6 +45,7 @@ fun DeviceListScreen(
     onSettings: () -> Unit,
 ) {
     val devices by viewModel.devices.collectAsStateWithLifecycle()
+    val refreshing by viewModel.refreshing.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
@@ -57,21 +59,28 @@ fun DeviceListScreen(
             )
         },
     ) { padding ->
-        LazyColumn(
+        // Pull down to search again and check which devices are reachable.
+        PullToRefreshBox(
+            isRefreshing = refreshing,
+            onRefresh = viewModel::refresh,
             modifier = Modifier.padding(padding).fillMaxSize(),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            if (localNetworkDenied) {
-                item {
-                    Text(stringResource(R.string.local_network_denied), color = MaterialTheme.colorScheme.error)
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                if (localNetworkDenied) {
+                    item {
+                        Text(stringResource(R.string.local_network_denied), color = MaterialTheme.colorScheme.error)
+                    }
                 }
-            }
-            items(devices, key = { it.id }) { device ->
-                DeviceCard(device, onClick = { onOpen(device.id) })
-            }
-            if (devices.none { it.online }) {
-                item { Searching() }
+                items(devices, key = { it.id }) { device ->
+                    DeviceCard(device, onClick = { onOpen(device.id) })
+                }
+                if (devices.none { it.online }) {
+                    item { Searching() }
+                }
             }
         }
     }

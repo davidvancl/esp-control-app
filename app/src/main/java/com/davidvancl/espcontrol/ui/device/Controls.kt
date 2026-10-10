@@ -5,12 +5,17 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -19,9 +24,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.davidvancl.espcontrol.R
 import kotlin.math.roundToInt
@@ -97,4 +106,61 @@ fun IntSlider(
             },
         )
     }
+}
+
+/** Dialog for an integer in 0..[max]; [onBlank] adds a button that clears the value (ikarus displays). */
+@Composable
+fun NumberDialog(
+    title: String,
+    value: Int?,
+    max: Int,
+    onDismiss: () -> Unit,
+    onConfirm: (Int) -> Unit,
+    onBlank: (() -> Unit)? = null,
+) {
+    var text by remember { mutableStateOf(value?.toString().orEmpty()) }
+    val parsed = text.toIntOrNull()?.takeIf { it in 0..max }
+    val focus = remember { FocusRequester() }
+    LaunchedEffect(Unit) { focus.requestFocus() }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(title) },
+        text = {
+            OutlinedTextField(
+                value = text,
+                onValueChange = { new -> text = new.filter(Char::isDigit).take(max.toString().length) },
+                supportingText = { Text(stringResource(R.string.range_hint, 0, max)) },
+                isError = text.isNotEmpty() && parsed == null,
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(onDone = { parsed?.let(onConfirm) }),
+                modifier = Modifier.focusRequester(focus),
+            )
+        },
+        confirmButton = {
+            TextButton(onClick = { parsed?.let(onConfirm) }, enabled = parsed != null) {
+                Text(stringResource(R.string.send))
+            }
+        },
+        dismissButton = {
+            Row {
+                if (onBlank != null) {
+                    TextButton(onClick = onBlank) { Text(stringResource(R.string.ikarus_blank)) }
+                }
+                TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
+            }
+        },
+    )
+}
+
+/** Asks before an action that cannot be undone. */
+@Composable
+fun ConfirmDialog(title: String, text: String, confirm: String, onDismiss: () -> Unit, onConfirm: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(title) },
+        text = { Text(text) },
+        confirmButton = { TextButton(onClick = onConfirm) { Text(confirm) } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } },
+    )
 }
