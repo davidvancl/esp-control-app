@@ -14,6 +14,7 @@ import okhttp3.Request
 import okhttp3.Response
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener
+import okio.ByteString.Companion.toByteString
 
 /** WebSocket at `ws://<host>/ws`, one JSON object per text frame. */
 class WsConnection(client: OkHttpClient, host: String) : DeviceConnection {
@@ -56,12 +57,21 @@ class WsConnection(client: OkHttpClient, host: String) : DeviceConnection {
     override fun send(text: String): Boolean =
         _state.value == ConnectionState.OPEN && socket.send(text)
 
+    override fun sendBinary(data: ByteArray, offset: Int, length: Int): Boolean =
+        _state.value == ConnectionState.OPEN &&
+            socket.queueSize() <= MAX_QUEUE_BYTES &&
+            socket.send(data.toByteString(offset, length))
+
     override fun close() {
         socket.close(1000, null)
         _state.value = ConnectionState.CLOSED
     }
 
     private companion object {
+        /** On a slow WiFi the OkHttp send queue must not grow without limit. */
+        const val MAX_QUEUE_BYTES = 64 * 1024L
+
+
         fun formatHost(host: String) = if (':' in host && !host.startsWith("[")) "[$host]" else host
     }
 }

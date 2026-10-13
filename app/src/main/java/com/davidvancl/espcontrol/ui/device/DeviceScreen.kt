@@ -1,5 +1,7 @@
 package com.davidvancl.espcontrol.ui.device
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,10 +26,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -36,10 +40,14 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LifecycleStartEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.davidvancl.espcontrol.R
+import com.davidvancl.espcontrol.audio.MusicState
+import com.davidvancl.espcontrol.audio.MusicStreamService
 import com.davidvancl.espcontrol.device.FailReason
 import com.davidvancl.espcontrol.device.PairingState
 import com.davidvancl.espcontrol.device.Notice
 import com.davidvancl.espcontrol.device.SessionStatus
+import kotlinx.coroutines.launch
+import kotlinx.serialization.json.JsonPrimitive
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,7 +59,15 @@ fun DeviceScreen(viewModel: DeviceViewModel, onBack: () -> Unit) {
     val values by session.values.collectAsStateWithLifecycle()
     val pairing by session.pairing.collectAsStateWithLifecycle()
     val snackbar = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
     val resources = LocalResources.current
+    val context = LocalContext.current
+    val music by MusicStreamService.state.collectAsStateWithLifecycle()
+    val musicChoice by viewModel.musicChoice.collectAsStateWithLifecycle()
+    // Here and not in CoinJarScreen, which leaves the composition while reconnecting after the picker.
+    val pickMusic = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri != null) viewModel.chooseMusic(context, uri)
+    }
     var confirmRestart by remember { mutableStateOf(false) }
 
     if (confirmRestart) {
@@ -160,6 +176,30 @@ fun DeviceScreen(viewModel: DeviceViewModel, onBack: () -> Unit) {
                         onSet = viewModel::set,
                         onSetContinuous = viewModel::setThrottled,
                         onRefresh = session::refresh,
+                        onResetCoins = {
+                            viewModel.set("coins", JsonPrimitive(0)) {
+                                scope.launch { snackbar.showSnackbar(resources.getString(R.string.coin_jar_reset_done)) }
+                            }
+                        },
+                        music = music.takeIf { it.deviceId == viewModel.deviceId } ?: MusicState.Idle,
+                        musicChoice = musicChoice,
+                        onPickMusic = { pickMusic.launch(arrayOf("audio/*")) },
+                        onPlayMusic = { uri, track ->
+                            val host = entry?.host
+                            val token = entry?.token
+                            if (host != null && token != null) {
+                                MusicStreamService.play(
+                                    context = context,
+                                    deviceId = viewModel.deviceId,
+                                    deviceName = info?.name ?: entry?.name.orEmpty(),
+                                    host = host,
+                                    token = token,
+                                    uri = uri,
+                                    track = track,
+                                )
+                            }
+                        },
+                        onStopMusic = { MusicStreamService.stop(context) },
                         modifier = modifier,
                     )
                     else -> GenericDeviceScreen(

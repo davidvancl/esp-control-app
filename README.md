@@ -19,7 +19,7 @@ On Android 17 and newer the app asks for access to the local network on first st
 | Type | Project | Screen |
 |---|---|---|
 | `ikarus` | [project-ikarus](https://github.com/davidvancl/project-ikarus) | displays, display brightness, button LEDs, key switch and button presses |
-| `coin-jar` | [coin-jar](https://github.com/davidvancl/coin-jar) | coin count, reset and correction, chime volume, light barrier diagnostics |
+| `coin-jar` | [coin-jar](https://github.com/davidvancl/coin-jar) | total coin count stored in the jar, reset and correction, LED light and colors, chime volume, music from the phone, light barrier diagnostics |
 | other | – | generic list of readable values and a JSON input for every writable value |
 
 infinity-cube-lamp and gitlab-pipeline-semaphor get their own screens once they use the library.
@@ -59,9 +59,13 @@ The device decides how it is paired. A PIN is valid for 60 s and three wrong att
 
 | Part | Control |
 |---|---|
-| Coins | count since the jar was switched on, animated with every coin; pencil to correct the count, "Reset counter" with confirmation |
+| Coins | total count stored in the jar (survives restarts and updates), always read from the jar after connecting – "…" until it arrives; animated with every coin; pencil to correct the count, "Reset counter" with confirmation – the reset is permanent, also in the jar |
+| Light | "Permanent light" switch, 5 LEDs as colored circles – tap one to change its color, "All the same" sets one color for all; brightness slider 1–255 with percent; flash color for a coin. Color choice: presets and hue / saturation. The jar resets light, colors and brightness on restart |
 | Sound | volume slider 0–32767, "Play chime" plays the coin effect |
+| Music | "Choose song" picks an audio file (MP3, AAC/M4A, OGG, FLAC, WAV – whatever the phone can decode); ▶ Play / ■ Stop, position and length, the jar's audio buffer ("Buffer 450 ms", "Waiting for data…" when empty). "Play chime" is disabled while music plays, the volume slider also sets the music volume |
 | Light barrier diagnostics | collapsible: barrier OK / not working, current and idle value (0–4095), refreshed every second while open |
+
+Music is decoded on the phone and streamed to the jar as PCM (16 bit, mono, 22050 Hz) over WebSocket binary frames, paced so that the jar keeps 300–600 ms buffered. The stream runs in a foreground service with its own connection, so it keeps playing with the screen off or the app in the background; the notification shows the song and has a Stop button. On Android 13+ the app asks for permission to show notifications; the music plays without it as well. If the connection drops, the app reconnects 3 times and continues where it stopped.
 
 Pairing: the LEDs blink 4 colors in a loop; tap the colored buttons in the same order. Every color is labelled with its name for color-blind users.
 
@@ -109,6 +113,7 @@ Package `com.davidvancl.espcontrol`:
 - `data/KnownDeviceStore.kt` – known devices and their tokens (DataStore)
 - `data/DeviceRepository.kt` – known and discovered devices, online status
 - `device/DeviceSession.kt` – one connection: hello, requests, events, pairing, reconnecting
+- `audio/` – music for the coin-jar: `PcmDecoder` (MediaCodec → PCM s16le mono 22050 Hz), `MusicStreamService` (foreground service streaming over its own WebSocket)
 - `ui/list/` – device list and settings
 - `ui/device/` – device screen, pairing (numeric and symbol PIN), `IkarusScreen`, `CoinJarScreen`, `GenericDeviceScreen`, shared controls in `Controls.kt`
 - `res/values-cs/` – Czech translation (English is the default)

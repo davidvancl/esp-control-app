@@ -60,6 +60,13 @@
     <string name="color_blue">modrá</string>
     <string name="color_yellow">žlutá</string>
     <string name="color_purple">fialová</string>
+    <string name="color_warm_white">teplá bílá</string>
+    <string name="color_white">bílá</string>
+    <string name="color_orange">oranžová</string>
+    <string name="color_turquoise">tyrkysová</string>
+    <string name="color_pink">růžová</string>
+    <string name="color_hue">Odstín</string>
+    <string name="color_saturation">Sytost</string>
 
     <!-- Ikarus -->
     <string name="ikarus_inputs">Vstupy panelu</string>
@@ -89,7 +96,7 @@
 
     <!-- Coin jar -->
     <string name="coin_jar_coins">Mince</string>
-    <string name="coin_jar_coins_hint">Počítáno od zapnutí pokladničky. S každou mincí se číslo rozzáří.</string>
+    <string name="coin_jar_coins_hint">Celkový počet mincí, pokladnička si ho pamatuje i po vypnutí.</string>
     <plurals name="coin_jar_coins_unit">
         <item quantity="one">mince</item>
         <item quantity="few">mince</item>
@@ -99,7 +106,26 @@
     <string name="coin_jar_edit">Opravit počet</string>
     <string name="coin_jar_reset">Vynulovat počítadlo</string>
     <string name="coin_jar_reset_title">Vynulovat počítadlo?</string>
-    <string name="coin_jar_reset_message">Počet mincí se nastaví na 0. Nejde to vrátit zpět.</string>
+    <plurals name="coin_jar_reset_message">
+        <item quantity="one">Počítadlo se vynuluje i v pokladničce a původní počet už nepůjde obnovit. Aktuálně: %d mince.</item>
+        <item quantity="few">Počítadlo se vynuluje i v pokladničce a původní počet už nepůjde obnovit. Aktuálně: %d mince.</item>
+        <item quantity="many">Počítadlo se vynuluje i v pokladničce a původní počet už nepůjde obnovit. Aktuálně: %d mince.</item>
+        <item quantity="other">Počítadlo se vynuluje i v pokladničce a původní počet už nepůjde obnovit. Aktuálně: %d mincí.</item>
+    </plurals>
+    <string name="coin_jar_reset_done">Počítadlo vynulováno</string>
+    <string name="coin_jar_coins_loading">Načítám…</string>
+    <string name="coin_jar_edit_message">Nová hodnota se v pokladničce uloží trvale.</string>
+    <string name="coin_jar_light">Světlo</string>
+    <string name="coin_jar_light_hint">Trvalé svícení 5 LED a záblesk při vhození mince.</string>
+    <string name="coin_jar_light_on">Trvalé svícení</string>
+    <string name="coin_jar_light_colors">Barvy LED</string>
+    <string name="coin_jar_led">LED %1$d, %2$s</string>
+    <string name="coin_jar_led_title">Barva LED %1$d</string>
+    <string name="coin_jar_light_all">Všechny stejně</string>
+    <string name="coin_jar_brightness">Jas</string>
+    <string name="coin_jar_flash_color">Barva záblesku při minci</string>
+    <string name="coin_jar_flash_color_value">Barva záblesku při minci, %1$s</string>
+    <string name="coin_jar_light_note">Světlo, barvy a jas se po restartu pokladničky vrátí na výchozí.</string>
     <string name="coin_jar_reset_confirm">Vynulovat</string>
     <string name="coin_jar_sound">Zvuk</string>
     <string name="coin_jar_sound_hint">Cinknutí, které zahraje s každou mincí.</string>
@@ -111,6 +137,28 @@
     <string name="coin_jar_barrier_failed">Nefunguje</string>
     <string name="coin_jar_sensor">Aktuální hodnota</string>
     <string name="coin_jar_baseline">Klidová hodnota</string>
+    <string name="coin_jar_music">Hudba</string>
+    <string name="coin_jar_music_hint">Pošle skladbu z telefonu do reproduktoru pokladničky. Hraje i na pozadí, zastavíš ji z notifikace.</string>
+    <string name="coin_jar_music_pick">Vybrat skladbu</string>
+    <string name="coin_jar_music_none">Není vybraná žádná skladba</string>
+    <string name="coin_jar_music_play">▶ Přehrát</string>
+    <string name="coin_jar_music_stop">■ Zastavit</string>
+    <string name="coin_jar_music_buffer">Buffer %1$d ms</string>
+    <string name="coin_jar_music_waiting">Čekám na data…</string>
+    <string name="coin_jar_music_stopped">Zastaveno</string>
+    <string name="coin_jar_music_elsewhere">Hraje hudba z jiného telefonu</string>
+    <string name="coin_jar_music_note">Hlasitost nastavíš posuvníkem výše. Během hudby mince jen blikne, bez cinknutí.</string>
+    <string name="music_channel">Streamování hudby</string>
+    <string name="music_connecting">Připojuji…</string>
+    <string name="music_reconnecting">Spojení se ztratilo, připojuji znovu…</string>
+    <string name="music_playing_on">Hraje na zařízení %1$s</string>
+    <string name="music_stop">Zastavit</string>
+    <string name="music_error_read">Soubor nejde přečíst.</string>
+    <string name="music_error_no_audio">Soubor neobsahuje zvuk.</string>
+    <string name="music_error_unsupported">Tento formát zvuku telefon neumí dekódovat.</string>
+    <string name="music_error_connection">Spojení s pokladničkou se ztratilo.</string>
+    <string name="music_error_not_paired">Pokladnička tento telefon nezná, spáruj ho znovu.</string>
+    <string name="music_error_rejected">Pokladnička hudbu odmítla. Umí ji její firmware?</string>
 
     <!-- Generic device -->
     <string name="generic_unknown_type">Neznámý typ zařízení „%1$s“. Zobrazuji surové hodnoty.</string>

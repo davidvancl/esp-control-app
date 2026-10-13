@@ -133,7 +133,8 @@ class DeviceSession(
         if (_pairing.value !is PairingState.Failed) _pairing.value = PairingState.Idle
     }
 
-    fun set(id: String, value: JsonElement?) {
+    /** Sets a value; [onAck] runs when the device confirms it, errors and timeouts become [notices]. */
+    fun set(id: String, value: JsonElement?, onAck: (() -> Unit)? = null) {
         if (value != null && id !in _info.value?.get.orEmpty()) {
             // Write-only values cannot be read back: show the last value sent.
             _values.update { it + (id to value) }
@@ -142,6 +143,7 @@ class DeviceSession(
             when (val reply = request(Request.Set(id, value))) {
                 null -> _notices.emit(Notice.Timeout(id))
                 is Message.Err -> _notices.emit(Notice.Failed(id, reply.code, reply.msg))
+                is Message.Ack -> onAck?.invoke()
                 else -> Unit
             }
         }

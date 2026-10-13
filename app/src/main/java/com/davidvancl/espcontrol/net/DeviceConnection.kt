@@ -17,5 +17,13 @@ interface DeviceConnection {
 
     /** Sends one encoded message, returns `false` if the connection is not open. */
     fun send(text: String): Boolean
+
+    /**
+     * Sends [length] bytes of [data] from [offset] as one binary frame (raw data stream, see
+     * "Binary frames" in DESIGN.md). Returns `false` if the connection is not open or its send
+     * queue is full; the frame is then not sent and the caller decides whether to retry.
+     */
+    fun sendBinary(data: ByteArray, offset: Int = 0, length: Int = data.size): Boolean
+
     fun close()
 }

@@ -23,6 +23,7 @@ The app version is `appVersion` in `app/build.gradle.kts`; changing it on `main`
 | `net` | `DeviceConnection` interface, `WsConnection` (OkHttp), mDNS `Discovery` (NsdManager) |
 | `data` | `KnownDeviceStore` (DataStore), `DeviceRepository` (known + discovered devices) |
 | `device` | `DeviceSession` – one connection: hello, requests by `seq`, events, pairing, reconnect |
+| `audio` | coin-jar music: `PcmDecoder` (MediaExtractor/MediaCodec → PCM s16le mono 22050 Hz, conversions in `Pcm.kt`), `MusicStreamService` (foreground service, own WebSocket, pacing by `musicBuffer`) |
 | `ui.list` | device list, settings (manual IP, remove device) |
 | `ui.device` | device detail, pairing, one screen per device type (`IkarusScreen`, `CoinJarScreen`), `GenericDeviceScreen` fallback |
 

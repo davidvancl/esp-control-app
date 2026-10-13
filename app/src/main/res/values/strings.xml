@@ -62,6 +62,13 @@
     <string name="color_blue">blue</string>
     <string name="color_yellow">yellow</string>
     <string name="color_purple">purple</string>
+    <string name="color_warm_white">warm white</string>
+    <string name="color_white">white</string>
+    <string name="color_orange">orange</string>
+    <string name="color_turquoise">turquoise</string>
+    <string name="color_pink">pink</string>
+    <string name="color_hue">Hue</string>
+    <string name="color_saturation">Saturation</string>
 
     <!-- Ikarus -->
     <string name="ikarus_inputs">Panel inputs</string>
@@ -91,7 +98,7 @@
 
     <!-- Coin jar -->
     <string name="coin_jar_coins">Coins</string>
-    <string name="coin_jar_coins_hint">Counted since the jar was switched on. The number lights up with every coin.</string>
+    <string name="coin_jar_coins_hint">Total number of coins, kept by the jar even when switched off.</string>
     <plurals name="coin_jar_coins_unit">
         <item quantity="one">coin</item>
         <item quantity="other">coins</item>
@@ -99,7 +106,24 @@
     <string name="coin_jar_edit">Correct the count</string>
     <string name="coin_jar_reset">Reset counter</string>
     <string name="coin_jar_reset_title">Reset counter?</string>
-    <string name="coin_jar_reset_message">The coin count is set to 0. This cannot be undone.</string>
+    <plurals name="coin_jar_reset_message">
+        <item quantity="one">The counter is reset in the jar as well and the previous count cannot be restored. Current count: %d coin.</item>
+        <item quantity="other">The counter is reset in the jar as well and the previous count cannot be restored. Current count: %d coins.</item>
+    </plurals>
+    <string name="coin_jar_reset_done">Counter reset</string>
+    <string name="coin_jar_coins_loading">Loading…</string>
+    <string name="coin_jar_edit_message">The new count is stored in the jar permanently.</string>
+    <string name="coin_jar_light">Light</string>
+    <string name="coin_jar_light_hint">Permanent light of the 5 LEDs and the flash when a coin drops in.</string>
+    <string name="coin_jar_light_on">Permanent light</string>
+    <string name="coin_jar_light_colors">LED colors</string>
+    <string name="coin_jar_led">LED %1$d, %2$s</string>
+    <string name="coin_jar_led_title">Color of LED %1$d</string>
+    <string name="coin_jar_light_all">All the same</string>
+    <string name="coin_jar_brightness">Brightness</string>
+    <string name="coin_jar_flash_color">Flash color for a coin</string>
+    <string name="coin_jar_flash_color_value">Flash color for a coin, %1$s</string>
+    <string name="coin_jar_light_note">Light, colors and brightness return to their defaults when the jar restarts.</string>
     <string name="coin_jar_reset_confirm">Reset</string>
     <string name="coin_jar_sound">Sound</string>
     <string name="coin_jar_sound_hint">Chime played with every coin.</string>
@@ -112,6 +136,29 @@
     <string name="coin_jar_sensor">Current value</string>
     <string name="coin_jar_baseline">Idle value</string>
     <string name="coin_jar_adc_value" translatable="false">%1$d / %2$d</string>
+    <string name="coin_jar_music">Music</string>
+    <string name="coin_jar_music_hint">Streams a song from the phone to the jar\'s speaker. Keeps playing in the background, stop it from the notification.</string>
+    <string name="coin_jar_music_pick">Choose song</string>
+    <string name="coin_jar_music_none">No song chosen</string>
+    <string name="coin_jar_music_play">▶ Play</string>
+    <string name="coin_jar_music_stop">■ Stop</string>
+    <string name="coin_jar_music_progress" translatable="false">%1$s / %2$s</string>
+    <string name="coin_jar_music_buffer">Buffer %1$d ms</string>
+    <string name="coin_jar_music_waiting">Waiting for data…</string>
+    <string name="coin_jar_music_stopped">Stopped</string>
+    <string name="coin_jar_music_elsewhere">Music from another phone is playing</string>
+    <string name="coin_jar_music_note">Set the volume with the slider above. While music plays, a coin only flashes, without the chime.</string>
+    <string name="music_channel">Music streaming</string>
+    <string name="music_connecting">Connecting…</string>
+    <string name="music_reconnecting">Connection lost, reconnecting…</string>
+    <string name="music_playing_on">Playing on %1$s</string>
+    <string name="music_stop">Stop</string>
+    <string name="music_error_read">The file cannot be read.</string>
+    <string name="music_error_no_audio">The file contains no audio.</string>
+    <string name="music_error_unsupported">This phone cannot decode the audio format.</string>
+    <string name="music_error_connection">The connection to the jar was lost.</string>
+    <string name="music_error_not_paired">The jar does not know this phone. Pair it again.</string>
+    <string name="music_error_rejected">The jar refused the music. Does its firmware support it?</string>
 
     <!-- Generic device -->
     <string name="generic_unknown_type">Unknown device type \"%1$s\". Showing raw values.</string>
